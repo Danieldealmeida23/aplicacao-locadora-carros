@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use App\Models\Marca;
 use Illuminate\Http\Request;
 
@@ -33,7 +34,15 @@ class MarcaController extends Controller
 
         $request->validate($this->marca->rules(), $this->marca->feedback());
 
-        $marca = $this->marca->create($request->all());
+        $imagem = $request->file('imagem');
+        $imagem_urn = $imagem->store('imagens', 'public');
+
+        $marca = $this->marca->create(
+            [
+                'nome' => $request->nome,
+                'imagem' => $imagem_urn
+            ]
+        );
 
         return response()->json($marca, 201);
     }
@@ -76,7 +85,6 @@ class MarcaController extends Controller
                 if(array_key_exists($input, $request->all())){
 
                     $regrasDinamidas[$input] = $regra;
-
                 }
             }
 
@@ -86,8 +94,21 @@ class MarcaController extends Controller
             $request->validate($marca->rules(), $marca->feedback());
 
         }
+        //Remove um arquivo antigo, caso algum arquivo tenha sido encaminhado no request
+        if($request->file('imagem')){
+            Storage::disk('public')->delete($marca->imagem);
+        }
 
-        $marca->update($request->all());
+        $imagem = $request->file('imagem');
+        $imagem_urn = $imagem->store('imagens', 'public');
+
+
+        $marca->update(            
+            [
+            'nome' => $request->nome,
+            'imagem' => $imagem_urn
+            ]
+        );
 
         return response()->json($marca, 200);
 
@@ -104,6 +125,9 @@ class MarcaController extends Controller
 
             return response()->json(['erro' => 'O registro não existe !'], 404);
         }
+
+        //Remove um arquivo antigo, caso algum arquivo tenha sido encaminhado no request
+        Storage::disk('public')->delete($marca->imagem);
         $marca->delete();
 
         return response()->json(['msg' => 'A marca foi removida com sucesso !'],200);
