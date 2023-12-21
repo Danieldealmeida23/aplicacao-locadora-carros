@@ -30,8 +30,6 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
-
-
         $request->validate($this->marca->rules(), $this->marca->feedback());
 
         $imagem = $request->file('imagem');
@@ -53,7 +51,7 @@ class MarcaController extends Controller
      */
     public function show($id)
     {
-        $marca = $this->marca->find($id);
+        $marca = $this->marca->with('modelos')->find($id);
 
         if($marca === null){
             return response()->json(['erro' => 'O registro não existe !'], 404);
@@ -102,15 +100,21 @@ class MarcaController extends Controller
         $imagem = $request->file('imagem');
         $imagem_urn = $imagem->store('imagens', 'public');
 
+        $marca->fill($request->all());
+        $marca->imagem = $imagem_urn;
+        $marca->save();
 
+        return response()->json($marca, 200);
+
+        
+        /*
         $marca->update(            
             [
             'nome' => $request->nome,
             'imagem' => $imagem_urn
             ]
         );
-
-        return response()->json($marca, 200);
+        */
 
     }
 
