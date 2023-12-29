@@ -16,7 +16,6 @@
                                     <input id="email" type="email" class="form-control " name="email" value="" required autocomplete="email" autofocus v-model="email">
     
                                         <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
                                         </span>
                                 </div>
                             </div>

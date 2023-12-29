@@ -7,19 +7,19 @@
                         <div class="form-row">
                             <div class="col mb-3">
                                 <input-container-component titulo="ID: " id="inputId" idHelp="idHelp" texto-ajuda="Informe o ID da marca">
-                                    <input type="number" id="inputId" aria-describedby="idHelp" class="form-control">
+                                    <input type="number" id="inputId" aria-describedby="idHelp" class="form-control" v-model="busca.id">
                                 </input-container-component>
                             </div>
 
                             <div class="col mb-3">
                                 <input-container-component titulo="Nome da marca: " id="inputNome" idHelp="nomeHelp" texto-ajuda="Informe o nome da marca">
-                                    <input type="text" id="inputNome" aria-describedby="nomeHelp" class="form-control">
+                                    <input type="text" id="inputNome" aria-describedby="nomeHelp" class="form-control" v-model="busca.nome">
                                 </input-container-component>
                             </div>
                         </div>
                     </template>
                     <template v-slot:rodape>
-                        <button type="submit" class="btn btn-primary btn-sm float-right">Pesquisar</button>
+                        <button type="submit" class="btn btn-primary btn-sm float-right" @click="pesquisar()">Pesquisar</button>
                     </template>
                 </card-component>
 
@@ -29,13 +29,35 @@
 
                 <card-component titulo="Tabela de Registros">
                     <template v-slot:conteudo>
-                        <table-component :dados="marcas" :titulos="['id', 'nome', 'imagem']"></table-component>
+                        <table-component 
+                        :dados="marcas.data" 
+                        :titulos="
+                        {
+                            id: {titulo: 'ID', tipo: 'texto'},
+                            nome: {titulo: 'Nome', tipo: 'texto'},
+                            imagem: {titulo: 'Imagem', tipo: 'imagem'},
+                            created_at: {titulo: 'Criado em', tipo: 'data'}
+                        }" 
+                        :visualizar="{dataBsTarget: '#modalMarcaVisualizar',dataBsToggle: 'modal',visivel: true}" 
+                        :atualizar="{dataBsTarget: '#modalMarcaVisualizar',dataBsToggle: 'modal',visivel: true}" 
+                        :remover="{dataBsTarget: '#modalMarcaVisualizar',dataBsToggle: 'modal',visivel: true}"
+                        
+                        ></table-component>
                     </template>
                     <template v-slot:rodape>
+                        <paginate-component>
+                            <li v-for="l, key in marcas.links" :key="key" :class="l.active ? 'page-item active': 'page-item'" @click="paginacao(l)">
+                                <a class="page-link" v-if="l.label == 'pagination.previous'">Anterior</a>  
+                                <a class="page-link" v-else-if="l.label == 'pagination.next'">Proxima</a>
+                                <a class="page-link" v-else>{{l.label}}</a> 
+                            </li>
+                        </paginate-component>
                         <button type="button" class="btn btn-primary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#modalMarca">Adicionar</button>
                     </template>
                 </card-component>
 
+
+                <!-- Início do Modal de inclusão de marca -->
                 <modal-component titulo="Adicionar marca" id="modalMarca">
 
                     <template v-slot:alertas>
@@ -60,6 +82,43 @@
                         <button type="button" class="btn btn-primary" @click="salvar" >Salvar</button>
                     </template>
                 </modal-component>
+                <!-- Final do Modal de inclusão de marca -->
+
+
+                <!-- Início do Modal de visualização de marca -->
+                <modal-component titulo="Visualizar Marca" id="modalMarcaVisualizar" >
+
+                    <template v-slot:alertas>
+                        <alert-component tipo="success" :detalhes="transacaoDetalhes" v-if="transacaoStatus == 'Adicionado'" titulo="Cadastro realizado com sucesso !"></alert-component>
+                        <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro" v-if=" transacaoStatus === 'Erro' "></alert-component>
+                    </template>
+
+                    <template v-slot:conteudo v-if="$store.state.item">
+                        
+                        <input-container-component titulo="ID">
+                            <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+                        </input-container-component>
+
+                        <input-container-component titulo="Nome da marca">
+                            <input type="text" class="form-control" :value="$store.state.item.nome" disabled>
+                        </input-container-component>
+
+                        <input-container-component titulo="Imagem">
+                            <img :src="'storage/'+$store.state.item.imagem" > 
+                        </input-container-component>
+
+                        <input-container-component titulo="Data de Criação">
+                        <input type="text" class="form-control" :value="$store.state.item.created_at" disabled>
+                        </input-container-component>
+
+
+                    </template>
+                    <template v-slot:rodape>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </template>
+
+                </modal-component>
+                <!-- Final do Modal de visualização de marca -->
             </div>
         </div>
     </div>
@@ -72,16 +131,59 @@ import axios from 'axios';
         data: function() {
             return{
                 urlBase: 'http://localhost:8000/api/v1/marca',
+                urlPaginacao: '',
+                urlFiltro: '',
                 nomeMarca: '',
                 arquivoImagem: [],
                 transacaoStatus: '',
                 transacaoDetalhes: {},
-                marcas: []
+                marcas: {data: []},
+                busca: {
+                    id: '',
+                    nome: ''
+                },
+                
+                
             }
         }, 
         methods: {
+            pesquisar(){
+                let filtro =''
+
+                for(let chave in this.busca){
+                    if(this.busca[chave]){
+                        if(filtro != ''){
+                            filtro += ";"
+                        }
+                        filtro += chave + ':like:' + this.busca[chave] 
+                    }
+                    if(filtro != ''){
+                        this.urlPaginacao = 'page=1'
+                        this.urlFiltro = '&filtro=' + filtro
+                    }else{
+                        this.urlFiltro = ''
+                    }
+                }
+                this.carregarLista()
+            },
+            paginacao(l){
+                if(l.url){
+                    //this.urlBase = l.url
+                    this.urlPaginacao = l.url.split('?')[1]
+                    this.carregarLista()
+                }
+
+            },
             carregarLista(){
-                axios.get(this.urlBase, this.config)
+                let lista = this.urlBase + '?' + this.urlPaginacao + this.urlFiltro
+                var config= {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+                axios.get(lista, config)
                     .then(response => {
                         this.marcas = response.data
                     })
@@ -97,14 +199,13 @@ import axios from 'axios';
                 let formData = new FormData();
                 formData.append('nome', this.nomeMarca)
                 formData.append('imagem', this.arquivoImagem[0])
-                let config = {
+                var config= {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Accept': 'application/json',
                         'Authorization': this.token
                     }
                 }
-                console.log(this.urlBase, formData, config)
                 axios.post(this.urlBase, formData, config)
                     .then(response => {
                         this.transacaoStatus = 'Adicionado'

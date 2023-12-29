@@ -30,8 +30,8 @@ class AbstractRepository {
         $this->model = $this->model->selectRaw($atributos);
     }
 
-    public function getResultado(){
-        return $this->model->get();
+    public function getResultadoPaginado($numeroRegistroPorPagina){
+        return $this->model->paginate($numeroRegistroPorPagina);
     }
 
     //Criar uma função para retornar a query no estado final do objeto (filtros)
