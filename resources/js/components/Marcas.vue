@@ -29,7 +29,7 @@
 
                 <card-component titulo="Tabela de Registros">
                     <template v-slot:conteudo>
-                        <table-component 
+                        <table-component v-if="marcas.data"
                         :dados="marcas.data" 
                         :titulos="
                         {
@@ -86,14 +86,14 @@
 
 
                 <!-- Início do Modal de visualização de marca -->
-                <modal-component titulo="Visualizar Marca" id="modalMarcaVisualizar" >
+                <modal-component titulo="Visualizar Marca" id="modalMarcaVisualizar">
 
-                    <template v-slot:alertas>
-                        <alert-component tipo="success" :detalhes="transacaoDetalhes" v-if="transacaoStatus == 'Adicionado'" titulo="Cadastro realizado com sucesso !"></alert-component>
-                        <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro" v-if=" transacaoStatus === 'Erro' "></alert-component>
+                    <template v-slot:alertas v-if="this.$store.state.transacao.status">
+                        <alert-component tipo="success" :detalhes="this.$store.state.transacao" titulo="Transação realizada com sucesso" v-if="this.$store.state.transacao.status == 'sucesso'"></alert-component>
+                        <alert-component tipo="danger" :detalhes="this.$store.state.transacao" titulo="Erro" v-if="this.$store.state.transacao.status == 'erro'"></alert-component>
                     </template>
 
-                    <template v-slot:conteudo v-if="$store.state.item">
+                    <template v-slot:conteudo v-if="$store.state.transacao.status != 'sucesso'">
                         
                         <input-container-component titulo="ID">
                             <input type="text" class="form-control" :value="$store.state.item.id" disabled>
@@ -104,7 +104,7 @@
                         </input-container-component>
 
                         <input-container-component titulo="Imagem">
-                            <img :src="'storage/'+$store.state.item.imagem" > 
+                            <img :src="'storage/'+$store.state.item.imagem" v-if="$store.state.item.imagem != undefined"> 
                         </input-container-component>
 
                         <input-container-component titulo="Data de Criação">
@@ -114,6 +114,7 @@
 
                     </template>
                     <template v-slot:rodape>
+                        <button class="btn btn-outline-danger btn-sm float-left" @click="remover(obj)" v-if="$store.state.transacao.status != 'sucesso'">Remover</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </template>
 
@@ -147,6 +148,34 @@ import axios from 'axios';
             }
         }, 
         methods: {
+            remover(){
+                let confirmacao = confirm('Você tem certeza que deseja apagar o registro ?')
+                if(!confirmacao){
+                    return false
+                }
+                let formData = new FormData()
+                formData.append('_method', 'delete')
+
+                let url = this.urlBase + '/' + this.$store.state.item.id
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+                
+                axios.post(url, formData, config)
+                    .then(response => {
+                        this.$store.state.transacao.status = 'sucesso'
+                        this.$store.state.transacao.mensagem = response.data.msg
+                        this.carregarLista()
+                    })
+                    .catch(errors => {
+                        this.$store.state.transacao.status = 'erro'
+                        this.$store.state.transacao.mensagem = errors.response.data.erro
+                    })
+                
+            },
             pesquisar(){
                 let filtro =''
 
