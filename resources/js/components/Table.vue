@@ -11,12 +11,12 @@
                 <tr v-for="obj, chave in dadosFiltrados" :key="chave">
                     <td v-for="valor, chaveValor in obj" :key="chaveValor">
                         <span v-if="titulos[chaveValor].tipo == 'imagem'"><img :src="caminho+valor" width="30" height="30" v-if="valor != undefined"></span>
-                        <span v-else-if="titulos[chaveValor].tipo == 'data'">{{ valor }}</span>
+                        <span v-else-if="titulos[chaveValor].tipo == 'data'">{{ $filters.formataDataTempo(valor) }}</span>
                         <span v-else-if="titulos[chaveValor].tipo == 'texto'">{{ valor }}</span>
                     </td>
                     <td v-if="visualizar || atualizar || remover">
                         <button v-if="visualizar.visivel" class="btn btn-outline-primary btn-sm" :data-bs-toggle="visualizar.dataBsToggle" :data-bs-target="visualizar.dataBsTarget" @click="setStore(obj)">Visualizar</button>
-                        <button v-if="atualizar.visivel" class="btn btn-outline-warning btn-sm">Atualizar</button>
+                        <button v-if="atualizar.visivel" class="btn btn-outline-warning btn-sm" :data-bs-toggle="atualizar.dataBsToggle" :data-bs-target="atualizar.dataBsTarget" @click="setStore(obj)">Atualizar</button>
                     </td>
                 </tr>
                 <!--

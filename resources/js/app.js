@@ -33,6 +33,18 @@ const app = createApp({
     store
 });
 app.use(store)
+app.config.globalProperties.$filters = {
+    formataDataTempo(d){
+        if(!d){ return ''}
+        d = d.split('T')
+        let data = d[0]
+        let tempo = d[1].split('.')[0]
+        data = new Date(data).toLocaleDateString('pt-BR');
+        return data + ' as: ' + tempo
+        
+    }
+}
+
 
 import ExampleComponent from './components/ExampleComponent.vue';
 import LoginComponent from './components/Login.vue';

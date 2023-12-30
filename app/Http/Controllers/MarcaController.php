@@ -82,8 +82,8 @@ class MarcaController extends Controller
      * Update the specified resource in storage.
      * @param Integer
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
+       $request->validate($this->marca->rules(), $this->marca->feedback());
         $marca = $this->marca->find($id);
 
         if($marca === null)
@@ -112,19 +112,17 @@ class MarcaController extends Controller
 
         }
 
-        //Remove um arquivo antigo, caso algum arquivo tenha sido encaminhado no request
+        $marca->fill($request->all());
         if($request->file('imagem')){
             Storage::disk('public')->delete($marca->imagem);
+            $imagem = $request->file('imagem');
+            $imagem_urn = $imagem->store('imagens', 'public');
+            $marca->imagem = $imagem_urn;
         }
 
-
-        $imagem = $request->file('imagem');
-        $imagem_urn = $imagem->store('imagens', 'public');
-        $marca->fill($request->all());
-        $marca->imagem = $imagem_urn;
         $marca->save();
-
         return response()->json($marca, 200);
+
     }
 
     /**
