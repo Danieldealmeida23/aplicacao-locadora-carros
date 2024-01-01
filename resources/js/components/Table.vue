@@ -42,7 +42,7 @@
 export default {
     data: function(){
         return {
-            caminho: '/storage/'
+            caminho: 'http://localhost:8000/storage/'
         }
     },
     props: ['dados', 'titulos', 'atualizar', 'visualizar'],
@@ -50,7 +50,7 @@ export default {
         setStore(obj){
             this.$store.state.transacao.status = ''
             this.$store.state.transacao.mensagem = ''
-            this.$store.state.item = obj
+            this.$store.state.item = this.dados[0]
         }
     },
     computed: {

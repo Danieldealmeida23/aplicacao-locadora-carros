@@ -2,17 +2,17 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <card-component titulo="Marcas">
+                <card-component titulo="Carros">
                     <template v-slot:conteudo>
                         <div class="form-row">
                             <div class="col mb-3">
-                                <input-container-component titulo="ID: " id="inputId" idHelp="idHelp" texto-ajuda="Informe o ID da marca">
+                                <input-container-component titulo="ID: " id="inputId" idHelp="idHelp" texto-ajuda="Informe o ID do carro">
                                     <input type="number" id="inputId" aria-describedby="idHelp" class="form-control" v-model="busca.id">
                                 </input-container-component>
                             </div>
 
                             <div class="col mb-3">
-                                <input-container-component titulo="Nome da marca: " id="inputNome" idHelp="nomeHelp" texto-ajuda="Informe o nome da marca">
+                                <input-container-component titulo="Nome do carro: " id="inputNome" idHelp="nomeHelp" texto-ajuda="Informe o nome do carro">
                                     <input type="text" id="inputNome" aria-describedby="nomeHelp" class="form-control" v-model="busca.nome">
                                 </input-container-component>
                             </div>
@@ -29,8 +29,8 @@
 
                 <card-component titulo="Tabela de Registros">
                     <template v-slot:conteudo>
-                        <table-component v-if="marcas.data"
-                        :dados="marcas.data" 
+                        <table-component v-if="carros.data"
+                        :dados="carros.data" 
                         :titulos="
                         {
                             id: {titulo: 'ID', tipo: 'texto'},
@@ -38,36 +38,36 @@
                             imagem: {titulo: 'Imagem', tipo: 'imagem'},
                             created_at: {titulo: 'Criado em', tipo: 'data'}
                         }" 
-                        :visualizar="{dataBsTarget: '#modalMarcaVisualizar',dataBsToggle: 'modal',visivel: true}" 
-                        :atualizar="{dataBsTarget: '#modalMarcaAtualizar',dataBsToggle: 'modal',visivel: true}" 
+                        :visualizar="{dataBsTarget: '#modalCarrosVisualizar',dataBsToggle: 'modal',visivel: true}" 
+                        :atualizar="{dataBsTarget: '#modalCarrosAtualizar',dataBsToggle: 'modal',visivel: true}" 
                         
                         ></table-component>
                     </template>
                     <template v-slot:rodape>
                         <paginate-component>
-                            <li v-for="l, key in marcas.links" :key="key" :class="l.active ? 'page-item active': 'page-item'" @click="paginacao(l)">
+                            <li v-for="l, key in carros.links" :key="key" :class="l.active ? 'page-item active': 'page-item'" @click="paginacao(l)">
                                 <a class="page-link" v-if="l.label == 'pagination.previous'">Anterior</a>  
                                 <a class="page-link" v-else-if="l.label == 'pagination.next'">Proxima</a>
                                 <a class="page-link" v-else>{{l.label}}</a> 
                             </li>
                         </paginate-component>
-                        <button type="button" class="btn btn-primary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#modalMarca">Adicionar</button>
+                        <button type="button" class="btn btn-primary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#modalCarro">Adicionar</button>
                     </template>
                 </card-component>
 
 
-                <!-- Início do Modal de inclusão de marca -->
-                <modal-component titulo="Adicionar marca" id="modalMarca">
+                <!-- Início do Modal de inclusão de carro -->
+                <modal-component titulo="Adicionar carro" id="modalCarro">
 
                     <template v-slot:alertas>
                         <alert-component tipo="success" :detalhes="transacaoDetalhes" v-if="transacaoStatus == 'Adicionado'" titulo="Cadastro realizado com sucesso !"></alert-component>
-                        <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro ao tentar cadastrar a marca !" v-if=" transacaoStatus === 'Erro' "></alert-component>
+                        <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro ao tentar cadastrar o carro !" v-if=" transacaoStatus === 'Erro' "></alert-component>
                     </template>
 
                     <template v-slot:conteudo>
                         <div class="form-group">
-                            <input-container-component titulo="Nome da marca: " id="novoNome" idHelp="novoNomeHelp" texto-ajuda="Informe o nome da marca">
-                                <input type="text" id="novoNome" aria-describedby="novoNomeHelp" class="form-control" v-model="nomeMarca">
+                            <input-container-component titulo="Nome do carro: " id="novoNome" idHelp="novoNomeHelp" texto-ajuda="Informe o nome do carro">
+                                <input type="text" id="novoNome" aria-describedby="novoNomeHelp" class="form-control" v-model="nomeCarro">
                             </input-container-component>
                         </div>
                         <div class="form-group">
@@ -81,11 +81,11 @@
                         <button type="button" class="btn btn-primary" @click="salvar" >Salvar</button>
                     </template>
                 </modal-component>
-                <!-- Final do Modal de inclusão de marca -->
+                <!-- Final do Modal de inclusão do carro -->
 
 
-                <!-- Início do Modal de visualização de marca -->
-                <modal-component titulo="Visualizar Marca" id="modalMarcaVisualizar">
+                <!-- Início do Modal de visualização do carro -->
+                <modal-component titulo="Visualizar Carro" id="modalCarroVisualizar">
 
                     <template v-slot:alertas v-if="this.$store.state.transacao.status">
                         <alert-component tipo="success" :detalhes="this.$store.state.transacao" titulo="Transação realizada com sucesso" v-if="this.$store.state.transacao.status == 'sucesso'"></alert-component>
@@ -93,13 +93,17 @@
                     </template>
 
                     <template v-slot:conteudo v-if="$store.state.transacao.status != 'sucesso'">
+                        
+                        <input-container-component titulo="ID">
+                            <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+                        </input-container-component>
 
-                        <input-container-component titulo="Nome da marca">
+                        <input-container-component titulo="Nome do carro">
                             <input type="text" class="form-control" :value="$store.state.item.nome" disabled>
                         </input-container-component>
 
-                        <input-container-component>
-                            <img :src="'http://localhost:8000/storage/'+$store.state.item.imagem" v-if="$store.state.item.imagem != undefined"> 
+                        <input-container-component titulo="Imagem">
+                            <img :src="'storage/'+$store.state.item.imagem" v-if="$store.state.item.imagem != undefined"> 
                         </input-container-component>
 
                         <input-container-component titulo="Data de Criação">
@@ -114,10 +118,10 @@
                     </template>
 
                 </modal-component>
-                <!-- Final do Modal de visualização de marca -->
+                <!-- Final do Modal de visualização do carro -->
 
-                <!-- Início do Modal de atualização de marca -->
-                <modal-component titulo="Atualizar marca" id="modalMarcaAtualizar">
+                <!-- Início do Modal de atualização do carro -->
+                <modal-component titulo="Atualizar carro" id="modalCarroAtualizar">
 
                     <template v-slot:alertas>
                         <alert-component tipo="success" :detalhes="transacaoDetalhes" v-if="transacaoStatus == 'sucesso'"></alert-component>
@@ -126,7 +130,7 @@
 
                     <template v-slot:conteudo>
                         <div class="form-group">
-                            <input-container-component titulo="Nome da marca: " id="atualizarNome" idHelp="atualizarNomeHelp" texto-ajuda="Informe o nome da marca">
+                            <input-container-component titulo="Nome do carro: " id="atualizarNome" idHelp="atualizarNomeHelp" texto-ajuda="Informe o nome do carro">
                                 <input type="text" id="atualizarNome" aria-describedby="atualizarNomeHelp" class="form-control" v-model="this.$store.state.item.nome" :placeholder="this.$store.state.item.nome">
                             </input-container-component>
                         </div>
@@ -141,7 +145,7 @@
                         <button type="button" class="btn btn-primary" @click="atualizar" >Atualizar</button>
                     </template>
                 </modal-component>
-                <!-- Final do Modal de atualização de marca -->
+                <!-- Final do Modal de atualização do carro -->
             </div>
         </div>
     </div>
@@ -151,13 +155,14 @@
 export default {
     data: function() {
         return{
+            urlBase: 'http://localhost:8000/api/v1/carro',
             urlPaginacao: '',
             urlFiltro: '',
-            nomeMarca: '',
+            nomeCarro: '',
             arquivoImagem: [],
             transacaoStatus: '',
             transacaoDetalhes: {},
-            marcas: {data: []},
+            carros: {data: []},
             busca: {
                 id: '',
                 nome: ''
@@ -174,7 +179,7 @@ export default {
             if(this.arquivoImagem[0]){
                 formData.append('imagem', this.arquivoImagem[0])
             }
-            let url = this.$store.state.urlBases.urlMarcas + '/' + this.$store.state.item.id
+            let url = this.urlBase + '/' + this.$store.state.item.id
             axios.post(url, formData)
                 .then(response => {
                     this.transacaoStatus = 'sucesso'
@@ -195,7 +200,7 @@ export default {
             let formData = new FormData()
             formData.append('_method', 'delete')
 
-            let url = this.$store.state.urlBases.urlMarcas + '/' + this.$store.state.item.id
+            let url = this.urlBase + '/' + this.$store.state.item.id
             let config = {
                 headers: {
                     'Accept': 'application/json',
@@ -243,10 +248,10 @@ export default {
 
         },
         carregarLista(){
-            let lista = this.$store.state.urlBases.urlMarcas + '?' + this.urlPaginacao + this.urlFiltro
+            let lista = this.urlBase + '?' + this.urlPaginacao + this.urlFiltro
             axios.get(lista)
                 .then(response => {
-                    this.marcas = response.data
+                    this.carros = response.data
                 })
                 .catch(errors => {
                     console.log(errors)
@@ -258,9 +263,9 @@ export default {
         salvar(){
 
             let formData = new FormData();
-            formData.append('nome', this.nomeMarca)
+            formData.append('nome', this.nomecarro)
             formData.append('imagem', this.arquivoImagem[0])
-            axios.post(this.$store.state.urlBases.urlMarcas, formData)
+            axios.post(this.urlBase, formData)
                 .then(response => {
                     this.transacaoStatus = 'Adicionado'
                     this.transacaoDetalhes = {mensagem: 'ID do registro: '+response.data.id} 

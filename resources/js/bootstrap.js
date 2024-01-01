@@ -10,7 +10,43 @@ import axios from 'axios';
 window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.interceptors.request.use(
+    config => {
 
+
+        let token = document.cookie.split(";").find(indice => {
+            return indice.includes('token=')
+        })
+
+        token = token.replace('token=','Bearer ')
+
+        config.headers['Accept'] = 'application/json'
+        config.headers.Authorization = token
+
+        
+        return config
+    },
+    error => {
+        return Promise.reject(error)
+    }
+)
+window.axios.interceptors.response.use(
+    response=> {
+        return response
+    }, 
+    error => {
+        if(error.response.status == 401 && error.response.data.message == 'Token has expired'){
+            axios.post('http://localhost:8000/api/refresh')
+                .then(response => {
+                    document.cookie = 'token='+response.data.token+';SameSite=Lax'
+                    window.location.reload()
+                })
+                .catch(error => {
+                })
+        }
+        return Promise.reject(error)
+    }
+)
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

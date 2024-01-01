@@ -16,6 +16,11 @@ export const store = createStore({
         transacao: {
             status: '',
             mensagem: ''
+        },
+        urlBases: {
+            urlModelos: 'http://localhost:8000/api/v1/modelo',
+            urlMarcas: 'http://localhost:8000/api/v1/marca',
+            urlMarcasGet: 'http://localhost:8000/api/v1/registrosmarca'
         }
     }
   })
@@ -50,6 +55,8 @@ import ExampleComponent from './components/ExampleComponent.vue';
 import LoginComponent from './components/Login.vue';
 import HomeComponent from './components/Home.vue';
 import MarcasComponent from './components/Marcas.vue';
+import CarrosComponent from './components/Carros.vue';
+import ModelosComponent from './components/Modelos.vue';
 import InputContainer from './components/InputContainer.vue';
 import TableComponent from './components/Table.vue';
 import CardComponent from './components/Card.vue';
@@ -61,6 +68,8 @@ app.component('example-component', ExampleComponent);
 app.component('login-component', LoginComponent);
 app.component('home-component', HomeComponent);
 app.component('marcas-component', MarcasComponent);
+app.component('carros-component', CarrosComponent);
+app.component('modelos-component', ModelosComponent);
 app.component('input-container-component', InputContainer);
 app.component('table-component', TableComponent);
 app.component('card-component', CardComponent);

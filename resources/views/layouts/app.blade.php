@@ -43,9 +43,9 @@
                             <li class="nav-item dropdown">
                                 <a id="dropdownVeiculos" class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Veículos</a>
                                 <div class="dropdown-menu" aria-labelledby="dropdownVeiculos">
-                                    <a class="dropdown-item" href="#">Carros</a>
+                                    <a class="dropdown-item" href="{{ route('carros') }}">Carros</a>
                                     <a class="dropdown-item" href="{{ route('marcas') }}">Marcas</a>
-                                    <a class="dropdown-item" href="#">Modelos</a>
+                                    <a class="dropdown-item" href="{{ route('modelos')}}">Modelos</a>
                                 </div>
                             </li>
                         @endauth
