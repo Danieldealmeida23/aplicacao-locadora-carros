@@ -20,7 +20,9 @@ export const store = createStore({
         urlBases: {
             urlModelos: 'http://localhost:8000/api/v1/modelo',
             urlMarcas: 'http://localhost:8000/api/v1/marca',
-            urlMarcasGet: 'http://localhost:8000/api/v1/registrosmarca'
+            urlMarcasGet: 'http://localhost:8000/api/v1/registrosmarca',
+            urlModelosGet: 'http://localhost:8000/api/v1/registrosmodelos',
+            urlCarros: 'http://localhost:8000/api/v1/carro'
         }
     }
   })

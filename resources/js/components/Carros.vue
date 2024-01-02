@@ -12,8 +12,8 @@
                             </div>
 
                             <div class="col mb-3">
-                                <input-container-component titulo="Nome do carro: " id="inputNome" idHelp="nomeHelp" texto-ajuda="Informe o nome do carro">
-                                    <input type="text" id="inputNome" aria-describedby="nomeHelp" class="form-control" v-model="busca.nome">
+                                <input-container-component titulo="Placa do carro: " id="inputPlaca" idHelp="placaHelp" texto-ajuda="Informe o placa do carro">
+                                    <input type="text" id="inputPlaca" aria-describedby="placaHelp" class="form-control" v-model="busca.placa">
                                 </input-container-component>
                             </div>
                         </div>
@@ -30,16 +30,17 @@
                 <card-component titulo="Tabela de Registros">
                     <template v-slot:conteudo>
                         <table-component v-if="carros.data"
-                        :dados="carros.data" 
+                        :dados="carros.data"
                         :titulos="
                         {
-                            id: {titulo: 'ID', tipo: 'texto'},
-                            nome: {titulo: 'Nome', tipo: 'texto'},
-                            imagem: {titulo: 'Imagem', tipo: 'imagem'},
+
+                            modelo: {titulo: 'Modelo', tipo: 'texto'},
+                            placa: {titulo: 'Placa', tipo: 'texto'},
+                            disponivel: {titulo: 'Disponibilidade', tipo: 'texto'},
                             created_at: {titulo: 'Criado em', tipo: 'data'}
                         }" 
-                        :visualizar="{dataBsTarget: '#modalCarrosVisualizar',dataBsToggle: 'modal',visivel: true}" 
-                        :atualizar="{dataBsTarget: '#modalCarrosAtualizar',dataBsToggle: 'modal',visivel: true}" 
+                        :visualizar="{dataBsTarget: '#modalCarroVisualizar',dataBsToggle: 'modal',visivel: true}" 
+                        :atualizar="{dataBsTarget: '#modalCarroAtualizar',dataBsToggle: 'modal',visivel: true}" 
                         
                         ></table-component>
                     </template>
@@ -51,7 +52,7 @@
                                 <a class="page-link" v-else>{{l.label}}</a> 
                             </li>
                         </paginate-component>
-                        <button type="button" class="btn btn-primary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#modalCarro">Adicionar</button>
+                        <button type="button" class="btn btn-primary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#modalCarro" @click="carregarModelos">Adicionar</button>
                     </template>
                 </card-component>
 
@@ -66,15 +67,33 @@
 
                     <template v-slot:conteudo>
                         <div class="form-group">
-                            <input-container-component titulo="Nome do carro: " id="novoNome" idHelp="novoNomeHelp" texto-ajuda="Informe o nome do carro">
-                                <input type="text" id="novoNome" aria-describedby="novoNomeHelp" class="form-control" v-model="nomeCarro">
+                            <input-container-component titulo="Modelo do carro: " id="novoModelo" idHelp="novoModeloHelp" texto-ajuda="Informe o modelo do carro">
+                            <select id="novoModelo" class="form-control" v-model="idmodelo">
+                                <option value="">Selecione o Modelo </option>
+                                <option v-for="modelo in modelos" :value="modelo.id" :key="modelo.id">{{ modelo.nome}}</option>
+                            </select>
                             </input-container-component>
                         </div>
+
                         <div class="form-group">
-                            <input-container-component titulo="Imagem: " id="novoImagem" idHelp="novoImagemHelp" texto-ajuda="Selecione uma imagem no formato PNG !" @change="carregarImagem($event)">
-                                <input type="file" id="novoImagem" aria-describedby="novoImagemHelp" class="form-control-file">
+                            <input-container-component titulo="Placa do carro: " id="novoPlaca" idHelp="novoPlacaHelp" texto-ajuda="Informe a placa do carro">
+                                <input type="text" id="novoPlaca" aria-describedby="novoPlacaHelp" class="form-control" v-model="placa">
                             </input-container-component>
                         </div>
+
+                        <div class="form-group">
+                            <input-container-component titulo="Disponível ? " id="novoDisponivel" idHelp="novoDisponivelHelp" texto-ajuda="Verifique se o veículo está disponível">
+                                <input type="text" id="novoDisponivel" aria-describedby="novoDisponivelHelp" class="form-control" :value="disponibilidade == '1' ? 'Sim' : 'Não'" disabled >
+                            </input-container-component>
+                        </div>
+
+                        <div class="form-group">
+                            <input-container-component titulo="Kilometragem de entrada: " id="novoKm" idHelp="novoKmHelp" texto-ajuda="Informe a kilometragem do carro">
+                                <input type="text" id="novoKm" aria-describedby="novoKmHelp" class="form-control" v-model="kilometragem">
+                            </input-container-component>
+                        </div>
+
+
                     </template>
                     <template v-slot:rodape>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -85,7 +104,7 @@
 
 
                 <!-- Início do Modal de visualização do carro -->
-                <modal-component titulo="Visualizar Carro" id="modalCarroVisualizar">
+                <modal-component titulo="Visualizar Carro" id="modalCarroVisualizar" v-if="this.$store.state.item.modelo">
 
                     <template v-slot:alertas v-if="this.$store.state.transacao.status">
                         <alert-component tipo="success" :detalhes="this.$store.state.transacao" titulo="Transação realizada com sucesso" v-if="this.$store.state.transacao.status == 'sucesso'"></alert-component>
@@ -94,16 +113,20 @@
 
                     <template v-slot:conteudo v-if="$store.state.transacao.status != 'sucesso'">
                         
-                        <input-container-component titulo="ID">
-                            <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+                        <input-container-component titulo="Modelo do carro">
+                            <input type="text" class="form-control" :value="this.$store.state.item.modelo.nome" disabled>
                         </input-container-component>
 
-                        <input-container-component titulo="Nome do carro">
-                            <input type="text" class="form-control" :value="$store.state.item.nome" disabled>
+                        <input-container-component titulo="Placa do carro">
+                            <input type="text" class="form-control" :value="this.$store.state.item.placa" disabled>
                         </input-container-component>
 
-                        <input-container-component titulo="Imagem">
-                            <img :src="'storage/'+$store.state.item.imagem" v-if="$store.state.item.imagem != undefined"> 
+                        <input-container-component titulo="Disponibilidade">
+                            <input type="text" class="form-control" :value="this.$store.state.item.disponivel == '1' ? 'Disponível' : 'Não disponível' " disabled>
+                        </input-container-component>
+
+                        <input-container-component>
+                            <img width="200px" :src="'http://localhost:8000/storage/'+this.$store.state.item.modelo.imagem" v-if="this.$store.state.item.modelo.imagem != undefined"> 
                         </input-container-component>
 
                         <input-container-component titulo="Data de Criação">
@@ -121,7 +144,7 @@
                 <!-- Final do Modal de visualização do carro -->
 
                 <!-- Início do Modal de atualização do carro -->
-                <modal-component titulo="Atualizar carro" id="modalCarroAtualizar">
+                <modal-component titulo="Atualizar carro" id="modalCarroAtualizar" v-if="this.$store.state.item.modelo">
 
                     <template v-slot:alertas>
                         <alert-component tipo="success" :detalhes="transacaoDetalhes" v-if="transacaoStatus == 'sucesso'"></alert-component>
@@ -130,13 +153,26 @@
 
                     <template v-slot:conteudo>
                         <div class="form-group">
-                            <input-container-component titulo="Nome do carro: " id="atualizarNome" idHelp="atualizarNomeHelp" texto-ajuda="Informe o nome do carro">
-                                <input type="text" id="atualizarNome" aria-describedby="atualizarNomeHelp" class="form-control" v-model="this.$store.state.item.nome" :placeholder="this.$store.state.item.nome">
+                            <input-container-component titulo="Modelo do carro: " id="atualizaModelo" idHelp="atualizaModeloHelp" texto-ajuda="Informe o modelo do carro" @click="carregarModelos">
+                            <select id="atualizaModelo" class="form-control" v-model="this.$store.state.item.modelo_id">
+                                <option value="">Selecione o Modelo </option>
+                                <option v-for="modelo in modelos" :value="modelo.id" :key="modelo.id">{{ modelo.nome}}</option>
+                            </select>
                             </input-container-component>
                         </div>
                         <div class="form-group">
-                            <input-container-component titulo="Imagem: " id="atualizarImagem" idHelp="atualizarImagemHelp" texto-ajuda="Selecione uma imagem no formato PNG !" @change="carregarImagem($event)">
-                                <input type="file" id="atualizarImagem" aria-describedby="atualizarImagemHelp" class="form-control-file" >
+                            <input-container-component titulo="Placa: " id="atualizarPlaca" idHelp="atualizarPlacaHelp" texto-ajuda="Informe a placa do carro">
+                                <input type="text" id="atualizarPlaca" aria-describedby="atualizarPlacaHelp" class="form-control" v-model="this.$store.state.item.placa">
+                            </input-container-component>
+                        </div>
+                        <div class="form-group">
+                            <input-container-component titulo="Disponibilidade: " id="atualizarDisponivel" idHelp="atualizarDisponivelHelp" >
+                                <input type="text" id="atualizarDisponivel" aria-describedby="atualizarDisponivelHelp" class="form-control" :value="this.$store.state.item.disponivel == '1' ? 'Disponível' : 'Indisponível'" disabled>
+                            </input-container-component>
+                        </div>
+                        <div class="form-group">
+                            <input-container-component titulo="Kilometragem: " id="atualizarKilometragem" idHelp="atualizarKilometragemHelp" texto-ajuda="Informe a kilometragem do carro">
+                                <input type="text" id="atualizarKilometragem" aria-describedby="atualizarKilometragemHelp" class="form-control" v-model="this.$store.state.item.km">
                             </input-container-component>
                         </div>
                     </template>
@@ -155,31 +191,42 @@
 export default {
     data: function() {
         return{
-            urlBase: 'http://localhost:8000/api/v1/carro',
             urlPaginacao: '',
             urlFiltro: '',
-            nomeCarro: '',
-            arquivoImagem: [],
+            modelos: '',
+            idmodelo: '',
+            placa: '',
+            disponibilidade: '1',
+            kilometragem: '',
             transacaoStatus: '',
             transacaoDetalhes: {},
             carros: {data: []},
             busca: {
                 id: '',
-                nome: ''
+                placa: ''
             },
             
             
         }
     }, 
     methods: {
+        carregarModelos(){
+            let lista = this.$store.state.urlBases.urlModelosGet
+            axios.get(lista)
+                .then(response => {
+                    this.modelos = response.data
+                })
+                .catch(errors => {
+                })
+        },
         atualizar(){
             let formData = new FormData();
             formData.append('_method', 'patch')
-            formData.append('nome', this.$store.state.item.nome)
-            if(this.arquivoImagem[0]){
-                formData.append('imagem', this.arquivoImagem[0])
-            }
-            let url = this.urlBase + '/' + this.$store.state.item.id
+            formData.append('modelo_id', this.$store.state.item.modelo_id)
+            formData.append('disponivel', this.$store.state.item.disponivel)
+            formData.append('km', this.$store.state.item.km)
+            formData.append('placa', this.$store.state.item.placa)
+            let url = this.$store.state.urlBases.urlCarros + '/' + this.$store.state.item.id
             axios.post(url, formData)
                 .then(response => {
                     this.transacaoStatus = 'sucesso'
@@ -189,7 +236,7 @@ export default {
                 })
                 .catch(errors => {
                     this.transacaoStatus = 'erro'
-                    this.transacaoDetalhes = {mensagem: errors.response.data.message, dados: errors.response.data.errors } 
+                    this.transacaoDetalhes = {mensagem: errors.response.data.mensagem, dados: errors.response.data } 
                 })
         },
         remover(){
@@ -200,7 +247,7 @@ export default {
             let formData = new FormData()
             formData.append('_method', 'delete')
 
-            let url = this.urlBase + '/' + this.$store.state.item.id
+            let url = this.$store.state.urlBases.urlCarros + '/' + this.$store.state.item.id
             let config = {
                 headers: {
                     'Accept': 'application/json',
@@ -221,7 +268,7 @@ export default {
             
         },
         pesquisar(){
-            let filtro =''
+            let filtro = ''
 
             for(let chave in this.busca){
                 if(this.busca[chave]){
@@ -241,14 +288,14 @@ export default {
         },
         paginacao(l){
             if(l.url){
-                //this.urlBase = l.url
+                //this.$store.state.urlBases.urlCarros = l.url
                 this.urlPaginacao = l.url.split('?')[1]
                 this.carregarLista()
             }
 
         },
         carregarLista(){
-            let lista = this.urlBase + '?' + this.urlPaginacao + this.urlFiltro
+            let lista = this.$store.state.urlBases.urlCarros + '?' + this.urlPaginacao + this.urlFiltro
             axios.get(lista)
                 .then(response => {
                     this.carros = response.data
@@ -263,9 +310,11 @@ export default {
         salvar(){
 
             let formData = new FormData();
-            formData.append('nome', this.nomecarro)
-            formData.append('imagem', this.arquivoImagem[0])
-            axios.post(this.urlBase, formData)
+            formData.append('modelo_id', this.idmodelo)
+            formData.append('placa', this.placa)
+            formData.append('disponivel', this.disponibilidade)
+            formData.append('km', this.kilometragem)
+            axios.post(this.$store.state.urlBases.urlCarros, formData)
                 .then(response => {
                     this.transacaoStatus = 'Adicionado'
                     this.transacaoDetalhes = {mensagem: 'ID do registro: '+response.data.id} 
@@ -274,6 +323,7 @@ export default {
                     this.transacaoStatus = 'Erro'
                     this.transacaoDetalhes = {mensagem: errors.response.data.message, dados: errors.response.data.errors } 
                 })
+                this.carregarLista()
         }
     },
     mounted(){

@@ -4,7 +4,7 @@
             <thead>
                 <tr>
                     <th scope="col"  v-for="t, key in titulos" :key="key">{{ t.titulo }}</th>
-                    <th v-if="visualizar || atualizar || remover"></th>
+                    <th v-if="visualizar || atualizar"></th>
                 </tr>
             </thead>
             <tbody>
@@ -12,11 +12,17 @@
                     <td v-for="valor, chaveValor in obj" :key="chaveValor">
                         <span v-if="titulos[chaveValor].tipo == 'imagem'"><img :src="caminho+valor" width="30" height="30" v-if="valor != undefined"></span>
                         <span v-else-if="titulos[chaveValor].tipo == 'data'">{{ $filters.formataDataTempo(valor) }}</span>
+                        <span v-else-if="titulos[chaveValor].tipo == 'texto' && titulos[chaveValor].titulo == 'Disponibilidade'">
+                            <button :class="verificaDiponibilidade(valor)">
+                                {{ valor == "1" ? "Disponível" : "Não disponível" }}
+                            </button>
+                        </span>
+                        <span v-else-if="titulos[chaveValor].tipo == 'texto' &&  valor.nome ">{{ valor.nome}}</span>
                         <span v-else-if="titulos[chaveValor].tipo == 'texto'">{{ valor }}</span>
                     </td>
-                    <td v-if="visualizar || atualizar || remover">
-                        <button v-if="visualizar.visivel" class="btn btn-outline-primary btn-sm" :data-bs-toggle="visualizar.dataBsToggle" :data-bs-target="visualizar.dataBsTarget" @click="setStore(obj)">Visualizar</button>
-                        <button v-if="atualizar.visivel" class="btn btn-outline-warning btn-sm" :data-bs-toggle="atualizar.dataBsToggle" :data-bs-target="atualizar.dataBsTarget" @click="setStore(obj)">Atualizar</button>
+                    <td v-if="visualizar || atualizar || remover" :indice="0">
+                        <button v-if="visualizar.visivel" class="btn btn-outline-primary btn-sm" :data-bs-toggle="visualizar.dataBsToggle" :data-bs-target="visualizar.dataBsTarget" @click="setStore(chave)">Visualizar</button>
+                        <button v-if="atualizar.visivel" class="btn btn-outline-warning btn-sm" :data-bs-toggle="atualizar.dataBsToggle" :data-bs-target="atualizar.dataBsTarget" @click="setStore(chave)">Atualizar</button>
                     </td>
                 </tr>
                 <!--
@@ -40,17 +46,24 @@
     
 <script>
 export default {
+    props: ['dados',  'titulos', 'atualizar', 'visualizar'],
     data: function(){
         return {
             caminho: 'http://localhost:8000/storage/'
         }
     },
-    props: ['dados', 'titulos', 'atualizar', 'visualizar'],
     methods: {
-        setStore(obj){
+        verificaDiponibilidade(valor){
+            if(valor == "1"){
+                return "btn btn-success"
+            }else{
+                return "btn btn-warning"
+            }
+        },
+        setStore(indice){
             this.$store.state.transacao.status = ''
             this.$store.state.transacao.mensagem = ''
-            this.$store.state.item = this.dados[0]
+            this.$store.state.item = this.dados[indice]
         }
     },
     computed: {

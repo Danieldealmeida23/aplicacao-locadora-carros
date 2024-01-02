@@ -137,9 +137,9 @@
                         <input-container-component titulo="Marca: " v-if="$store.state.item.marca">
                             <input type="text" 
                             class="form-control" 
-                            :value="$store.state.item.marca.nome" 
+                            :value="this.$store.state.item.marca.nome" 
                             disabled
-                            :style="'background: url(http://localhost:8000/storage/'+$store.state.item.marca.imagem+') no-repeat left/2.5em; padding-left: 3.0em'">
+                            :style="'background: url(http://localhost:8000/storage/'+this.$store.state.item.marca.imagem+') no-repeat left/2.5em; padding-left: 3.0em'">
                         </input-container-component>
 
                         <input-container-component titulo="Quantidade de portas: ">
@@ -311,14 +311,9 @@ export default {
             formData.append('_method', 'delete')
 
             let url = this.$store.state.urlBases.urlModelos + '/' + this.$store.state.item.id
-            let config = {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': this.token
-                }
-            }
+
             
-            axios.post(url, formData, config)
+            axios.post(url, formData)
                 .then(response => {
                     this.$store.state.transacao.status = 'sucesso'
                     this.$store.state.transacao.mensagem = response.data.msg
@@ -389,6 +384,7 @@ export default {
                     this.transacaoStatus = 'Erro'
                     this.transacaoDetalhes = {mensagem: errors.response.data.message, dados: errors.response.data.errors } 
                 })
+            this.carregarLista()
         }
     },
     mounted(){

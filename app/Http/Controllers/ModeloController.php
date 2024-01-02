@@ -63,6 +63,11 @@ class ModeloController extends Controller
         return response()->json($modelo, 201);
     }
 
+    public function getModelos(){
+        $modeloRepository = new ModeloRepository($this->modelo);
+        return response()->json($modeloRepository->getResultado(), 200);
+    }
+
     /**
      * Display the specified resource.
      */
