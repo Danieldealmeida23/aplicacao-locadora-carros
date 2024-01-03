@@ -31,5 +31,11 @@ Route::prefix('v1')->middleware('auth')->group(function (){
     Route::get('/modelos', function(){
         return view('app.modelos');
     })->name('modelos');
+    Route::get('/clientes', function(){
+        return view('app.clientes');
+    })->name('clientes');
+    Route::get('/locacoes', function(){
+        return view('app.locacoes');
+    })->name('locacoes');
 });
 

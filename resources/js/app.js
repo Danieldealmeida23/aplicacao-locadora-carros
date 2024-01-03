@@ -3,10 +3,15 @@
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
+/** 
+ * import './bootstrap';
+ * import { createApp } from 'vue';
+ * import { createStore } from 'vuex';
+*/
 
 import './bootstrap';
 import { createApp } from 'vue';
-import { createStore } from 'vuex'
+import { createStore } from 'Vuex';
 
 /* importação e configuração do Vuex */
 
@@ -20,9 +25,14 @@ export const store = createStore({
         urlBases: {
             urlModelos: 'http://localhost:8000/api/v1/modelo',
             urlMarcas: 'http://localhost:8000/api/v1/marca',
+            urlLocacoes: 'http://localhost:8000/api/v1/locacao',
             urlMarcasGet: 'http://localhost:8000/api/v1/registrosmarca',
             urlModelosGet: 'http://localhost:8000/api/v1/registrosmodelos',
-            urlCarros: 'http://localhost:8000/api/v1/carro'
+            urlCarros: 'http://localhost:8000/api/v1/carro',
+            urlCarrosGet: 'http://localhost:8000/api/v1/registroscarros',
+            urlClientes: 'http://localhost:8000/api/v1/cliente',
+            urlClientesGet: 'http://localhost:8000/api/v1/registrosclientes',
+            urlLocacoes: 'http://localhost:8000/api/v1/locacao'
         }
     }
   })
@@ -49,6 +59,15 @@ app.config.globalProperties.$filters = {
         data = new Date(data).toLocaleDateString('pt-BR');
         return data + ' as: ' + tempo
         
+    },
+    formataDataTempoSistema(d){
+        if(!d){ return ''}
+        d = d.split(' ')
+        let data = d[0]
+        let tempo = d[1]
+        data = new Date(data).toLocaleDateString('pt-BR');
+        return data 
+        
     }
 }
 
@@ -59,6 +78,8 @@ import HomeComponent from './components/Home.vue';
 import MarcasComponent from './components/Marcas.vue';
 import CarrosComponent from './components/Carros.vue';
 import ModelosComponent from './components/Modelos.vue';
+import ClientesComponent from './components/Clientes.vue';
+import LocacoesComponent from './components/Locacoes.vue';
 import InputContainer from './components/InputContainer.vue';
 import TableComponent from './components/Table.vue';
 import CardComponent from './components/Card.vue';
@@ -72,6 +93,8 @@ app.component('home-component', HomeComponent);
 app.component('marcas-component', MarcasComponent);
 app.component('carros-component', CarrosComponent);
 app.component('modelos-component', ModelosComponent);
+app.component('clientes-component', ClientesComponent);
+app.component('locacoes-component', LocacoesComponent);
 app.component('input-container-component', InputContainer);
 app.component('table-component', TableComponent);
 app.component('card-component', CardComponent);

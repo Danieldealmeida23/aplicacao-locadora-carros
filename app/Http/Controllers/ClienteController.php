@@ -14,6 +14,10 @@ class ClienteController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function getClientes(){
+        $clienteRepository = new ClienteRepository($this->cliente);
+        return response()->json($clienteRepository->getResultado(), 200);
+    }
     public function index(Request $request)
     {
         $clienteRepository = new ClienteRepository($this->cliente);
@@ -27,7 +31,7 @@ class ClienteController extends Controller
             $clienteRepository->selectAtributos($request->atributos);
         }
 
-        return response()->json($clienteRepository->getResultado(), 200);
+        return response()->json($clienteRepository->getResultadoPaginado(3), 200);
     }
 
 
@@ -79,7 +83,7 @@ class ClienteController extends Controller
 
             $regrasDinamicas = array();
 
-            foreach($carro->rules() as $input => $regra){
+            foreach($cliente->rules() as $input => $regra){
 
                 if(array_key_exists($input, $request->all())){
 
@@ -114,6 +118,6 @@ class ClienteController extends Controller
 
         $cliente->delete();
 
-        return response()->json(['msg' => 'O carro foi removido com sucesso !'],200);
+        return response()->json(['msg' => 'O cliente foi removido com sucesso !'],200);
     }
 }

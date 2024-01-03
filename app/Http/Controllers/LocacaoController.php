@@ -20,6 +20,19 @@ class LocacaoController extends Controller
     public function index(Request $request)
     {
         $locacaoRepository = new LocacaoRepository($this->locacao);
+        if($request->has('atributos_clientes')){
+            $atributos_clientes = 'clientes:id,'.$request->atributos_clientes;
+            $locacaoRepository->selectAtributosRegistrosRelacionados($atributos_clientes);
+        }else{
+            $locacaoRepository->selectAtributosRegistrosRelacionados('cliente');
+        }
+
+        if($request->has('atributos_carros')){
+            $atributos_carros = 'clientes:id,'.$request->atributos_carros;
+            $locacaoRepository->selectAtributosRegistrosRelacionados($atributos_carros);
+        }else{
+            $locacaoRepository->selectAtributosRegistrosRelacionados('carro');
+        }
 
         if($request->has('filtro')){
             $locacaoRepository->filtro($request->filtro);
@@ -30,7 +43,7 @@ class LocacaoController extends Controller
             $locacaoRepository->selectAtributos($request->atributos);
         }
 
-        return response()->json($locacaoRepository->getResultado(), 200);
+        return response()->json($locacaoRepository->getResultadoPaginado(3), 200);
     }
 
     /**

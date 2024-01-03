@@ -71,10 +71,10 @@
                         </div>
                         <div class="form-group">
                             <input-container-component titulo="Marca: " id="novaMarca" idHelp="novaMarcaHelp" texto-ajuda="Informe o nome da marca">
-                                <select id="novaMarca" class="form-control" v-model="idmarca">
-                                    <option value="">Selecione a Marca </option>
-                                    <option v-for="marca in marcas" :value="marca.id" :key="marca.id">{{ marca.nome}}</option>
-                                </select>
+                            <select id="novaMarca" class="form-control" v-model="idmarca">
+                                <option value="">Selecione a Marca </option>
+                                <option v-for="marca in marcas" :value="marca.id" :key="marca.id">{{ marca.nome}}</option>
+                            </select>
                             </input-container-component>
                         </div>
 
@@ -187,7 +187,7 @@
 
                         <div class="form-group">
                             <input-container-component titulo="Marca: " id="atualizarMarca" idHelp="atualizarMarcaHelp" texto-ajuda="Informe o nome da marca">
-                                <select id="atualizarMarca" class="form-control" v-model="this.$store.state.item.marca_id" @click="carregarMarcas">
+                                <select id="atualizarMarca" class="form-control" v-model="this.$store.state.item.marca_id" >
                                     <option value="">Selecione a Marca </option>
                                     <option v-for="marca in marcas" :value="marca.id" :key="marca.id">{{ marca.nome}}</option>
                                 </select>
@@ -389,6 +389,7 @@ export default {
     },
     mounted(){
         this.carregarLista()
+        this.carregarMarcas()
     }
 
 }

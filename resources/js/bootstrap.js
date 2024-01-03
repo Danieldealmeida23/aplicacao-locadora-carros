@@ -35,14 +35,11 @@ window.axios.interceptors.response.use(
         return response
     }, 
     error => {
-        if(error.response.status == 401 && error.response.data.message == 'Token has expired'){
-            axios.post('http://localhost:8000/api/refresh')
-                .then(response => {
-                    document.cookie = 'token='+response.data.token+';SameSite=Lax'
-                    window.location.reload()
-                })
-                .catch(error => {
-                })
+        if(error.response.status == 401 && error.response.statusText == 'Unauthorized'){
+            let token = document.getElementsByName('_token')
+            let formData = new FormData();
+            formData.append('X-CSRF-TOKEN', token)
+            axios.post('http://localhost:8000/logout', formData)
         }
         return Promise.reject(error)
     }

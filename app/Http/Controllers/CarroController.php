@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carro;
-use App\Http\Requests\StoreCarroRequest;
-use App\Http\Requests\UpdateCarroRequest;
 use App\Repositories\CarroRepository;
 use Illuminate\Http\Request;
 
@@ -18,6 +16,19 @@ class CarroController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+     public function getCarros(Request $request){
+        $carroRepository = new CarroRepository($this->carro);
+
+        //Utilização do modelo MarcaRepository criado para encapsular os modelos de consulta
+        if($request->has('atributos_modelo')){
+            $atributos_modelo = 'modelo:id,'.$request->atributos_modelo;
+            $carroRepository->selectAtributosRegistrosRelacionados($atributos_modelo);
+        }else{
+            $carroRepository->selectAtributosRegistrosRelacionados('modelo');
+        }
+        return response()->json($carroRepository->getResultado(), 200);
+     }
     public function index(Request $request)
     {
         $carroRepository = new CarroRepository($this->carro);
@@ -66,7 +77,7 @@ class CarroController extends Controller
      */
     public function show($id)
     {
-        $carro = $this->carro->with('modelos')->find($id);
+        $carro = $this->carro->with('modelo')->find($id);
 
         if($carro === null){
             return response()->json(['erro' => 'O registro não existe !'], 404);

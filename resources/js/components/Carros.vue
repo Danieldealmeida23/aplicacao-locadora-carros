@@ -104,16 +104,16 @@
 
 
                 <!-- Início do Modal de visualização do carro -->
-                <modal-component titulo="Visualizar Carro" id="modalCarroVisualizar" v-if="this.$store.state.item.modelo">
+                <modal-component titulo="Visualizar Carro" id="modalCarroVisualizar">
 
                     <template v-slot:alertas v-if="this.$store.state.transacao.status">
                         <alert-component tipo="success" :detalhes="this.$store.state.transacao" titulo="Transação realizada com sucesso" v-if="this.$store.state.transacao.status == 'sucesso'"></alert-component>
                         <alert-component tipo="danger" :detalhes="this.$store.state.transacao" titulo="Erro" v-if="this.$store.state.transacao.status == 'erro'"></alert-component>
                     </template>
 
-                    <template v-slot:conteudo v-if="$store.state.transacao.status != 'sucesso'">
+                    <template v-slot:conteudo v-if="$store.state.transacao.status != 'sucesso'" >
                         
-                        <input-container-component titulo="Modelo do carro">
+                        <input-container-component titulo="Modelo do carro" v-if="this.$store.state.item.modelo">
                             <input type="text" class="form-control" :value="this.$store.state.item.modelo.nome" disabled>
                         </input-container-component>
 
@@ -125,7 +125,7 @@
                             <input type="text" class="form-control" :value="this.$store.state.item.disponivel == '1' ? 'Disponível' : 'Não disponível' " disabled>
                         </input-container-component>
 
-                        <input-container-component>
+                        <input-container-component v-if="this.$store.state.item.modelo">
                             <img width="200px" :src="'http://localhost:8000/storage/'+this.$store.state.item.modelo.imagem" v-if="this.$store.state.item.modelo.imagem != undefined"> 
                         </input-container-component>
 
@@ -144,7 +144,7 @@
                 <!-- Final do Modal de visualização do carro -->
 
                 <!-- Início do Modal de atualização do carro -->
-                <modal-component titulo="Atualizar carro" id="modalCarroAtualizar" v-if="this.$store.state.item.modelo">
+                <modal-component titulo="Atualizar carro" id="modalCarroAtualizar">
 
                     <template v-slot:alertas>
                         <alert-component tipo="success" :detalhes="transacaoDetalhes" v-if="transacaoStatus == 'sucesso'"></alert-component>
@@ -153,7 +153,7 @@
 
                     <template v-slot:conteudo>
                         <div class="form-group">
-                            <input-container-component titulo="Modelo do carro: " id="atualizaModelo" idHelp="atualizaModeloHelp" texto-ajuda="Informe o modelo do carro" @click="carregarModelos">
+                            <input-container-component titulo="Modelo do carro: " id="atualizaModelo" idHelp="atualizaModeloHelp" texto-ajuda="Informe o modelo do carro" @click="carregarModelos" v-if="this.$store.state.item.modelo">
                             <select id="atualizaModelo" class="form-control" v-model="this.$store.state.item.modelo_id">
                                 <option value="">Selecione o Modelo </option>
                                 <option v-for="modelo in modelos" :value="modelo.id" :key="modelo.id">{{ modelo.nome}}</option>

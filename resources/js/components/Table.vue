@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div> {{ dadosFiltrados }}
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -18,9 +18,13 @@
                             </button>
                         </span>
                         <span v-else-if="titulos[chaveValor].tipo == 'texto' &&  valor.nome ">{{ valor.nome}}</span>
+                        <span v-else-if="titulos[chaveValor].tipo == 'texto' &&  valor.placa ">{{ valor.placa}}</span>
+                        <span v-else-if="titulos[chaveValor].titulo == 'Status' &&  valor.data_final_realizado_periodo != null ">Entregue</span>
+                        <span v-else-if="titulos[chaveValor].titulo == 'Status' && valor.data_final_realizado_periodo == null ">Pendente</span>
+                        <span v-else-if="titulos[chaveValor].tipo == 'dataSistema'">{{ $filters.formataDataTempoSistema(valor) }}</span>
                         <span v-else-if="titulos[chaveValor].tipo == 'texto'">{{ valor }}</span>
                     </td>
-                    <td v-if="visualizar || atualizar || remover" :indice="0">
+                    <td v-if="visualizar || atualizar" :indice="0">
                         <button v-if="visualizar.visivel" class="btn btn-outline-primary btn-sm" :data-bs-toggle="visualizar.dataBsToggle" :data-bs-target="visualizar.dataBsTarget" @click="setStore(chave)">Visualizar</button>
                         <button v-if="atualizar.visivel" class="btn btn-outline-warning btn-sm" :data-bs-toggle="atualizar.dataBsToggle" :data-bs-target="atualizar.dataBsTarget" @click="setStore(chave)">Atualizar</button>
                     </td>
@@ -46,7 +50,7 @@
     
 <script>
 export default {
-    props: ['dados',  'titulos', 'atualizar', 'visualizar'],
+    props: ['dados',  'titulos', 'atualizar', 'visualizar', 'pagina'],
     data: function(){
         return {
             caminho: 'http://localhost:8000/storage/'
@@ -78,6 +82,26 @@ export default {
             dadosFiltrados.push(itemFiltrado)
             })
             return dadosFiltrados
+        },
+        dadosFiltradosLocacao(){
+            let campos = object.keys(this.titulos)
+            let dadosFiltrados = []
+            this.dados.map((item, chave) => {
+                let itemFiltrado={}
+                campos.forEach(campo => {
+                    if(campo == 'cliente'){
+                        itemFiltrado[campo] = item.cliente[campo]
+                    }else if(campo == 'carro'){
+                        itemFiltrado[campo] = item.carro[campo]
+                    }else {
+                        itemFiltrado[campo] = item[campo]
+                    }
+                })
+            dadosFiltrados.push(itemFiltrado)
+            })
+
+            return dadosFiltrados
+
         }
     },
     mounted() {

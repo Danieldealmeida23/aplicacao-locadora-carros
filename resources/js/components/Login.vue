@@ -7,7 +7,7 @@
     
                     <div class="card-body">
                         <form method="POST" action="" @submit.prevent="login($event)">
-                            <input type="hidden" name="_token" :value=" token_csrf">
+                            <input type="hidden" name="_token" :value="token_csrf">
     
                             <div class="row mb-3">
                                 <label for="email" class="col-md-4 col-form-label text-md-end">E-mail</label>

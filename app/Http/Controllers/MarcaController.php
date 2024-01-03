@@ -43,7 +43,7 @@ class MarcaController extends Controller
         
     }
 
-    public function getModelo(){
+    public function getMarcas(){
         $marcaRepository = new MarcaRepository($this->marca);
         return response()->json($marcaRepository->getResultado(), 200);
     }

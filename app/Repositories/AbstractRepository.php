@@ -34,6 +34,10 @@ class AbstractRepository {
         return $this->model->paginate($numeroRegistroPorPagina);
     }
 
+    public function getResultado(){
+        return $this->model->get();
+    }
+
     //Criar uma função para retornar a query no estado final do objeto (filtros)
 }
 
