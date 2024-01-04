@@ -26,13 +26,11 @@
                         <table-component
                         :dados="locacoes.data"
                         :titulos="
+
                         {
-                            id: {titulo: 'ID', tipo: 'texto'},
-                            cliente: {titulo: 'Cliente', tipo: 'texto'},
                             carro: {titulo: 'Veiculo-placa', tipo: 'texto'},
+                            cliente: {titulo: 'Cliente', tipo: 'texto'},
                             data_inicio_periodo: {titulo: 'Data de início', tipo: 'dataSistema'},
-                            data_final_previsto_periodo: {titulo: 'Data prevista de entrega', tipo: 'dataSistema'},
-                            data_final_realizado_periodo: {titulo: 'Status', tipo: 'texto'}
                             
                         }" 
                         :visualizar="{dataBsTarget: '#modalLocacaoVisualizar',dataBsToggle: 'modal',visivel: true}" 
@@ -289,6 +287,7 @@ export default {
             axios.get(listaCarros)
                 .then(response => {
                     this.carros = response.data
+                    
                 })
                 .catch(errors => {
                     console.log(errors)
